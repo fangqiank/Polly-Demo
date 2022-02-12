@@ -7,27 +7,37 @@ namespace Request__Service.Controllers
     [Route("api/[Controller]")]
     public class RequestController : ControllerBase
     {
-        private readonly IClientPolicy _clientPolicy;
+        //private readonly IClientPolicy _clientPolicy;
+        private readonly IHttpClientFactory _clientFactory;
 
-        public RequestController(IClientPolicy clientPolicy)
+        public RequestController(
+            /*IClientPolicy clientPolicy,*/
+            IHttpClientFactory clientFactory
+            )
         {
-            _clientPolicy = clientPolicy;
+            //_clientPolicy = clientPolicy;
+            _clientFactory = clientFactory;
         }
 
         [HttpGet]
         public async Task<ActionResult> MakeRequest()
         {
-            var client = new HttpClient();
+            //var client = new HttpClient();
+            var client = _clientFactory.CreateClient("Test");
 
-            //var response = await client.GetAsync("https://localhost:5001/api/response/60");
+            var response = await client.GetAsync("https://localhost:5001/api/response/60");
 
             //var response = await _clientPolicy.ImmediateHttpRetry.ExecuteAsync(
-            //    () =>client.GetAsync("https://localhost:5001/api/response/60")
+            //    () => client.GetAsync("https://localhost:5001/api/response/60")
             //   );
 
-            var response = await _clientPolicy.LinearHttpRetry.ExecuteAsync(
-                () =>client.GetAsync("https://localhost:5001/api/response/60")
-               );
+            //var response = await _clientPolicy.LinearHttpRetry.ExecuteAsync(
+            //    () => client.GetAsync("https://localhost:5001/api/response/60")
+            //   );
+
+            //var response = await _clientPolicy.ExponentialHttpRetry.ExecuteAsync(
+            //    () => client.GetAsync("https://localhost:5001/api/response/60")
+            //    );
 
             if (response.IsSuccessStatusCode)
             {
